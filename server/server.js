@@ -17,9 +17,9 @@ app.listen(port);
 console.log('App listening on port ' + port);
 
 
-// load the product API routes...
-const productRoutes = require('./productRoutes');
-app.use('/api/products', productRoutes);
+// load the API routes...
+const routes = require('./routes');
+app.use('/api', routes);
 
 // Access-control stuff
 app.use(function (req, res, next) {
@@ -35,7 +35,7 @@ app.use(function (req, res, next) {
 
 // Server index.html page when request to the root is made
 app.get('/', function (req, res) {
-    res.sendfile('./public/index.html')
+    res.sendFile('./public/index.html')
 });
 
 module.exports = app;

@@ -1,9 +1,9 @@
 const express = require('express');
-const productRoutes = express.Router();
+const routes = express.Router();
 const products = require('./products');
 const index = require('./searchIndex');
 
-productRoutes.route('/search').get(function (req, res) {
+routes.route('/search').get(function (req, res) {
 
     console.log('/search: ' + req.query.keyword);
     const pageSize = parseInt(req.query.pageSize || 25);
@@ -23,13 +23,8 @@ productRoutes.route('/search').get(function (req, res) {
         const foundProductIds = searchResponse.map(x => x.ref);
         filteredProducts = filteredProducts.filter(p => foundProductIds.indexOf(p.id) >= 0);
     } else {
-        console.log('sorting alphabetically');
         filteredProducts.sort((a, b) => a.product.localeCompare(b.product));
     }
-
-    console.log('filteredProduct count: ', filteredProducts.length);
-    console.log('pageSize: ', pageSize);
-    console.log('pageIndex: ', pageIndex);
 
     res.json({
         products: filteredProducts.slice(pageSize * pageIndex, pageSize * (pageIndex + 1)),
@@ -39,7 +34,7 @@ productRoutes.route('/search').get(function (req, res) {
 });
 
 
-productRoutes.route('/get').get(function (req, res) {
+routes.route('/get').get(function (req, res) {
 
     console.log('/get: ' + req.query.id);
 
@@ -51,11 +46,18 @@ productRoutes.route('/get').get(function (req, res) {
     }
 });
 
-productRoutes.route('/checkout').post(function (req, res) {
+routes.route('/checkout').post(function (req, res) {
 
     console.log('/checkout: ' + req.body);
     console.log('An email has been sent to the customer informing them of their purchase');
-    res.status(200).send();
+    const orderId = getRandomInt(1000000);
+    res.status(201).send({ 
+        orderId: orderId
+    });
 });
 
-module.exports = productRoutes;
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+  }
+
+module.exports = routes;

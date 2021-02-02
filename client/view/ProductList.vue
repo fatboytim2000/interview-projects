@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid mt-4">
+  <div class="product-list container-fluid mt-4">
     <b-row>
       <b-col sm="12" md="8">
         <h1 class="h1">Products</h1>
@@ -42,37 +42,34 @@
       </b-col>
     </b-row>
 
-    <b-row>
-      <b-col>
-        <div v-if="isNextPage">
-          <button @click="nextPage" class="button-success button-sm">
-            Next &gt;
-          </button>
-        </div>
-        <div v-if="isPreviousPage">
-          <button @click="previousPage" class="button-success button-sm">
-            &lt; Previous
-          </button>
-        </div>
-      </b-col>
-    </b-row>
+    <b-pagination class="float-sm-right"
+      v-model="currentPage"
+      :total-rows="totalRows"
+      :per-page="searchPageSize"
+      @change="handlePageChange"
+    ></b-pagination>
   </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex';
+import { SEARCH_PRODUCTS } from './../store/actions';
 
 export default {
   data() {
     return {
       searchText: "",
+      currentPage: 1,
     };
   },
   async created() {
     this.search();
   },
   computed: {
-    ...mapGetters(["products", "totalProductPages", "currentProductPage"]),
+    ...mapGetters(["products", "totalProductPages", "currentProductPage", "searchPageSize"]),
+    totalRows() {
+      return this.totalProductPages * this.searchPageSize;
+    },
     isNextPage() {
       return this.currentProductPage < this.totalProductPages;
     },
@@ -81,20 +78,14 @@ export default {
     },
   },
   methods: {
-    nextPage() {
-      this.$store.dispatch("getProducts", {
+    handlePageChange(value) {
+      this.$store.dispatch(SEARCH_PRODUCTS, {
         searchText: this.searchText,
-        pageIndex: this.currentProductPage + 1,
-      });
-    },
-    previousPage() {
-      this.$store.dispatch("getProducts", {
-        searchText: this.searchText,
-        pageIndex: this.currentProductPage - 1,
+        pageIndex: value - 1,
       });
     },
     async search(reset) {
-      this.$store.dispatch("getProducts", {
+      this.$store.dispatch(SEARCH_PRODUCTS, {
         searchText: this.searchText,
         pageIndex: reset ? 0 : this.currentProductPage,
       });

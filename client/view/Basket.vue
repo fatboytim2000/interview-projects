@@ -11,7 +11,7 @@
       </b-col>
     </b-row>
 
-    <b-row>
+    <b-row v-if="!checkoutComplete"> 
       <b-col>
         <table class="table table-striped">
           <thead>
@@ -54,10 +54,13 @@
     </b-row>
     <b-row v-if="checkoutComplete">
       <b-col>
+        <b-card>
         <h2>
-          Thank you, your checkout was successful, you should shortly receive an
-          email confirming your order.
+          Thank you, your checkout was successful
         </h2>
+        <p>You should shortly receive an
+          email confirming your order.</p>
+        </b-card>
       </b-col>
     </b-row>
 
@@ -72,7 +75,8 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex';
+import { CHECKOUT_BASKET, REMOVE_FROM_BASKET } from './../store/actions';
 
 export default {
   data() {
@@ -82,7 +86,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["basket", "basketTotal"]),
+    ...mapGetters(['basket', 'basketTotal']),
     isEmpty() {
       return (
         Object.keys(this.basket).length === 0 &&
@@ -92,12 +96,10 @@ export default {
   },
   methods: {
     removeFromBasket(id) {
-      this.$store.commit("removeFromBasket", id);
+      this.$store.commit(REMOVE_FROM_BASKET, id);
     },
     checkOut() {
-      this.$store.dispatch("checkOut").then(() => {
-        this.checkoutComplete = true;
-      });
+      this.$store.dispatch(CHECKOUT_BASKET);
     },
   },
 };

@@ -1,5 +1,5 @@
 <template>
-  <div class="basket container-fluid mt-4">
+  <div class="product-details container-fluid mt-4">
     <router-link
       :to="{ path: '/' }"
       class="btn btn-secondary btn-sm float-md-right"
@@ -17,14 +17,16 @@
       <span>{{ currentProduct.price }}</span>
     </div>
 
-    <button @click="addToBasket" class="btn btn-success btn-sm">
+    <button v-if="currentProduct.id" @click="addToBasket" class="btn btn-success btn-sm">
       Add to basket
     </button>
   </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import accounting from 'accounting';
+import { mapGetters } from 'vuex';
+import { LOAD_PRODUCT, ADD_TO_BASKET } from './../store/actions';
 
 export default {
   data() {
@@ -33,22 +35,21 @@ export default {
     };
   },
   async created() {
-    this.$store.dispatch("getProduct", this.$route.query.id);
+    this.$store.dispatch(LOAD_PRODUCT, this.$route.query.id);
   },
   computed: {
-    ...mapGetters(["currentProduct", "basketTotal"]),
+    ...mapGetters(['currentProduct','basketTotal', 'basketItemCount']),
   },
   methods: {
     addToBasket() {
-      this.$store.commit("addToBasket", this.currentProduct);
+      this.$store.commit(ADD_TO_BASKET, this.currentProduct);
       this.$bvToast.toast(
-        "Total value of items in your basket: " + this.basketTotal,
+        `${this.basketItemCount} item(s) in your basket worth ${accounting.formatMoney(this.basketTotal, '£')}`, 
         {
           title: "Added item to your basket",
           variant: "success",
         }
       );
-      // router.push("/basket");
     },
   },
 };
